@@ -1,0 +1,142 @@
+#!/sbin/sh
+
+OUTFD=/proc/self/fd/$2
+ZIPFILE="$3"
+
+ui_print() {
+  echo -e "ui_print $1\nui_print" >>$OUTFD
+}
+
+package_extract_file() {
+  ui_print " - 正在刷入 $(echo $1 | awk -F "/" '{print $NF}') 至 $(echo $2 | awk -F "/" '{print $NF}') 分区"
+  unzip -p "$ZIPFILE" $1 >$2
+}
+
+keyListener() {
+  ui_print "按下 [音量+] 选择 是，按下 [音量-] 选择 否"
+  ui_print ""
+  keyListener_2
+}
+
+keyListener_2() {
+  getevent -qlc 1 2>&1 | grep VOLUME | grep " DOWN" >/tmp/events
+  if $(grep -q "VOLUMEUP" /tmp/events); then
+    ui_print " - 正在执行中，请稍后......"
+    return 0
+  elif $(grep -q "VOLUMEDOWN" /tmp/events); then
+    ui_print " - 正在执行中，请稍后......"
+    return 1
+  else
+    keyListener_2
+  fi
+}
+
+
+  ui_print " "
+  ui_print " "
+  ui_print "======================================"
+  ui_print "Github：https://github.com/zfdx123"
+  ui_print "======================================"
+  ui_print " "
+  ui_print " "
+  ui_print "是否需要校验ROM包完整性，以防止损坏导致刷机失败"
+
+
+if keyListener; then
+  localmd5=$(md5sum $ZIPFILE)
+  if [[ "$ZIPFILE" != *"${localmd5:0:10}"* ]]; then
+    ui_print "未在本地包名中找到对应的MD5，该ROM包已损坏"
+    exit 1
+  fi
+  ui_print "已完成校验ROM包完整性"
+else
+  ui_print "已跳过校验ROM包完整性"
+fi
+ui_print " "
+ui_print " "
+
+
+package_extract_file "images/boot.img" "/dev/block/by-name/boot_a"
+package_extract_file "images/boot.img" "/dev/block/by-name/boot_b"
+ui_print "已完成安装 Magisk"
+ui_print " "
+ui_print " "
+ui_print "是否关闭全部Magisk模块，防止模块不兼容该版本导致无法开机"
+if keyListener; then
+  for list in $(ls -d /data/adb/modules/*); do
+    touch $list/disable
+  done
+  ui_print "已完成关闭全部Magisk模块"
+else
+  ui_print "已取消关闭全部Magisk模块"
+fi
+
+ui_print " "
+ui_print " "
+package_extract_file "images/abl.img" "/dev/block/by-name/abl_a"
+package_extract_file "images/abl.img" "/dev/block/by-name/abl_b"
+package_extract_file "images/aop.img" "/dev/block/by-name/aop_a"
+package_extract_file "images/aop.img" "/dev/block/by-name/aop_b"
+package_extract_file "images/bluetooth.img" "/dev/block/by-name/bluetooth_a"
+package_extract_file "images/bluetooth.img" "/dev/block/by-name/bluetooth_b"
+package_extract_file "images/cmnlib64.img" "/dev/block/by-name/cmnlib64_a"
+package_extract_file "images/cmnlib64.img" "/dev/block/by-name/cmnlib64_b"
+package_extract_file "images/cmnlib.img" "/dev/block/by-name/cmnlib_a"
+package_extract_file "images/cmnlib.img" "/dev/block/by-name/cmnlib_b"
+package_extract_file "images/devcfg.img" "/dev/block/by-name/devcfg_a"
+package_extract_file "images/devcfg.img" "/dev/block/by-name/devcfg_b"
+package_extract_file "images/dsp.img" "/dev/block/by-name/dsp_a"
+package_extract_file "images/dsp.img" "/dev/block/by-name/dsp_b"
+package_extract_file "images/dtbo.img" "/dev/block/by-name/dtbo_a"
+package_extract_file "images/dtbo.img" "/dev/block/by-name/dtbo_b"
+package_extract_file "images/featenabler.img" "/dev/block/by-name/featenabler_a"
+package_extract_file "images/featenabler.img" "/dev/block/by-name/featenabler_b"
+package_extract_file "images/hyp.img" "/dev/block/by-name/hyp_a"
+package_extract_file "images/hyp.img" "/dev/block/by-name/hyp_b"
+package_extract_file "images/imagefv.img" "/dev/block/by-name/imagefv_a"
+package_extract_file "images/imagefv.img" "/dev/block/by-name/imagefv_b"
+package_extract_file "images/keymaster.img" "/dev/block/by-name/keymaster_a"
+package_extract_file "images/keymaster.img" "/dev/block/by-name/keymaster_b"
+package_extract_file "images/modem.img" "/dev/block/by-name/modem_a"
+package_extract_file "images/modem.img" "/dev/block/by-name/modem_b"
+package_extract_file "images/qupfw.img" "/dev/block/by-name/qupfw_a"
+package_extract_file "images/qupfw.img" "/dev/block/by-name/qupfw_b"
+package_extract_file "images/tz.img" "/dev/block/by-name/tz_a"
+package_extract_file "images/tz.img" "/dev/block/by-name/tz_b"
+package_extract_file "images/uefisecapp.img" "/dev/block/by-name/uefisecapp_a"
+package_extract_file "images/uefisecapp.img" "/dev/block/by-name/uefisecapp_b"
+package_extract_file "images/vbmeta.img" "/dev/block/by-name/vbmeta_a"
+package_extract_file "images/vbmeta.img" "/dev/block/by-name/vbmeta_b"
+package_extract_file "images/vbmeta_system.img" "/dev/block/by-name/vbmeta_system_a"
+package_extract_file "images/vbmeta_system.img" "/dev/block/by-name/vbmeta_system_b"
+package_extract_file "images/vendor_boot.img" "/dev/block/by-name/vendor_boot_a"
+package_extract_file "images/vendor_boot.img" "/dev/block/by-name/vendor_boot_b"
+package_extract_file "images/xbl_config.img" "/dev/block/by-name/xbl_config_a"
+package_extract_file "images/xbl_config.img" "/dev/block/by-name/xbl_config_b"
+package_extract_file "images/xbl.img" "/dev/block/by-name/xbl_a"
+package_extract_file "images/xbl.img" "/dev/block/by-name/xbl_b"
+# flash firmware done
+package_extract_file "images/cust.img" "/dev/block/by-name/cust"
+package_extract_file "images/super.img" "/dev/block/by-name/super"
+
+
+ui_print " "
+ui_print " "
+ui_print "======================================"
+ui_print "刷机已完成，红色挂载报错请忽略"
+ui_print "======================================"
+ui_print " "
+ui_print " "
+
+bootctl set-active-boot-slot a
+lptools unmap system
+lptools map system
+lptools unmap system_ext
+lptools map system_ext
+lptools unmap vendor
+lptools map vendor
+lptools unmap product
+lptools map product
+lptools unmap odm
+lptools map odm
+exit 0
