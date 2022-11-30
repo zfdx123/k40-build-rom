@@ -19,10 +19,12 @@ function main() {
 	unpackimg system
 	unpackimg vendor
 	unpackimg product
-    #VAB
+    #vbmeta
     vbmeta
 	#Boot Patch
     magisk_boot
+	#VAB
+	patch_vab
 	#System
 	system_patch
 	#打包IMG
@@ -71,11 +73,24 @@ function super(){
 }
 
 function vbmeta(){
-	# 替换 vbmeta 镜像
-	echo -e "$(date "+%m/%d %H:%M:%S") 正在去除 vbmeta 验证——————替换镜像"
-	cp -rf ${rootPath}/files/images/vbmeta.img ${rootPath}/out/images/vbmeta.img
-	cp -rf ${rootPath}/files/images/vbmeta_system.img ${rootPath}/out/images/vbmeta_system.img
-	echo -e "$(date "+%m/%d %H:%M:%S") 正在去除 vbmeta 验证——————替换镜像——完成"
+	echo -e "$(date "+%m/%d %H:%M:%S") 正在去除 vbmeta 验证"
+	mv ${rootPath}/out/images/vbmeta.img vbmeta.img
+	mv ${rootPath}/out/images/vbmeta_system.img vbmeta_system.img
+
+	#计算偏移量
+	#AVB=`od -w16 -An -tx1 "*.img" | grep -i -B 2 '61 76 62 74 6f 6f 6c 20' | tr -d '[:space:]' | egrep -oi '000000..00000000617662746F6F6C20'`
+	# 00000000000000000000000300000000617662746f6f6c20 "3, AVB Disabled."
+	# 00000000000000000000000200000000617662746f6f6c20 "2, Boot Verification Disabled."
+	# 00000000000000000000000100000000617662746f6f6c20 "1, Dm-verity Disabled."
+	# 00000000000000000000000000000000617662746f6f6c20 "0, AVB Enabled."
+
+	sudo ${rootPath}/bin/magiskboot hexpatch vbmeta.img 0000000000000000617662746F6F6C20 0000000200000000617662746F6F6C20
+	sudo ${rootPath}/bin/magiskboot hexpatch vbmeta_system.img 0000000000000000617662746F6F6C20 0000000200000000617662746F6F6C20
+
+	mv vbmeta.img ${rootPath}/out/images/vbmeta.img
+	mv vbmeta_system.img ${rootPath}/out/images/vbmeta_system.img
+
+	echo -e "$(date "+%m/%d %H:%M:%S") 去除 vbmeta 验证 完成"
 }
 
 function magisk_boot() {
@@ -108,6 +123,14 @@ function magisk_boot() {
 	echo -e "$(date "+%m/%d %H:%M:%S") magisk 修补 vendor_boot 完成"
 }
 
+function patch_vab() {
+	echo -e "$(date "+%m/%d %H:%M:%S") 去除 fstab.qcom VAB相关"
+	sudo sed -i 's/,avb_keys=\/avb\/q-gsi.avbpubkey:\/avb\/r-gsi.avbpubkey:\/avb\/s-gsi.avbpubkey//g' vendor/vendor/etc/fstab.qcom
+	sudo sed -i 's/,avb=vbmeta_system//g' vendor/vendor/etc/fstab.qcom
+	sudo sed -i 's/,avb//g' vendor/vendor/etc/fstab.qcom
+	echo -e "$(date "+%m/%d %H:%M:%S") 修改 fstab.qcom 完成"
+}
+
 function system_patch() {
 	echo -e "$(date "+%m/%d %H:%M:%S") 开始修补System"
 
@@ -120,11 +143,6 @@ function system_patch() {
 	# theme
 	sudo cp -rf ${rootPath}/files/config/com.android.settings system/system/system/media/theme/default/com.android.settings
 	#sudo cp -rf ${rootPath}/files/config/com.android.systemui system/system/system/media/theme/default/com.android.systemui
-
-	# 去除 AVB
-	sudo sed -i 's/,avb_keys=\/avb\/q-gsi.avbpubkey:\/avb\/r-gsi.avbpubkey:\/avb\/s-gsi.avbpubkey//g' vendor/vendor/etc/fstab.qcom
-	sudo sed -i 's/,avb=vbmeta_system//g' vendor/vendor/etc/fstab.qcom
-	sudo sed -i 's/,avb//g' vendor/vendor/etc/fstab.qcom
 
     # DC调光
 	sudo sed -i 's/<bool name=\"support_dc_backlight\">false<\/bool>/<bool name=\"support_dc_backlight\">true<\/bool>/g' product/product/etc/device_features/*xml
