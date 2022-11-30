@@ -34,12 +34,13 @@ function main() {
 
 	mv images/system_ext.img system_ext.img
 	mv images/odm.img odm.img
-
 	super
 
+	echo -e "$(date "+%m/%d %H:%M:%S") 正在生成Rom"
 	sudo rm -rf _pycache_ system vendor product system.img vendor.img product.img system_ext.img odm.img
 	cp -rf ${rootPath}/files/META-INF ${rootPath}/out/META-INF
 	sudo zip -q -r rom.zip images META-INF
+	echo -e "$(date "+%m/%d %H:%M:%S") 项目运行结束"
 }
 
 function unpackimg(){
@@ -106,7 +107,7 @@ function magisk_boot() {
 	done
 	sudo ${rootPath}/bin/magiskboot repack boot.img
 	sudo rm -rf *kernel* *dtb* ramdisk.cpio*
-	[ -f new-boot.img ] && cp -rf new-boot.img ${rootPath}/out/images/boot.img
+	[ -f new-boot.img ] && mv new-boot.img images/boot.img
 	sudo rm -rf new-boot.img
 	echo -e "$(date "+%m/%d %H:%M:%S") magisk 修补 boot 完成"
 
@@ -118,7 +119,7 @@ function magisk_boot() {
 	done
 	sudo ${rootPath}/bin/magiskboot repack vendor_boot.img
 	sudo rm -rf *kernel* *dtb* ramdisk.cpio*
-	[ -f new-boot.img ] && cp -rf new-boot.img ${rootPath}/out/images/vendor_boot.img
+	[ -f new-boot.img ] && mv new-boot.img images/vendor_boot.img
 	sudo rm -rf new-boot.img
 	echo -e "$(date "+%m/%d %H:%M:%S") magisk 修补 vendor_boot 完成"
 }
