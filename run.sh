@@ -84,24 +84,24 @@ function magisk_boot() {
 	mv images/vendor_boot.img vendor_boot.img
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 正在使用 magisk 修补 boot"
-	sudo ${rootPath}/bin/magiskboot unpack boot.img >/dev/null 2>&1
+	sudo ${rootPath}/bin/magiskboot unpack boot.img
 	sudo ${rootPath}/bin/magiskboot cpio ramdisk.cpio patch
 	for dt in dtb kernel_dtb extra; do
 		[ -f $dt ] && sudo ${rootPath}/bin/magiskboot dtb $dt patch
 	done
-	sudo ${rootPath}/bin/magiskboot repack boot.img >/dev/null 2>&1
+	sudo ${rootPath}/bin/magiskboot repack boot.img
 	sudo rm -rf *kernel* *dtb* ramdisk.cpio*
 	[ -f new-boot.img ] && cp -rf new-boot.img ${rootPath}/out/images/boot.img
 	sudo rm -rf new-boot.img
 	echo -e "$(date "+%m/%d %H:%M:%S") magisk 修补 boot 完成"
 
     echo -e "$(date "+%m/%d %H:%M:%S") 正在使用 magisk 修补 vendor_boot"
-	sudo ${rootPath}/bin/magiskboot unpack vendor_boot.img >/dev/null 2>&1
+	sudo ${rootPath}/bin/magiskboot unpack vendor_boot.img
 	sudo ${rootPath}/bin/magiskboot cpio ramdisk.cpio patch
 	for dt in dtb kernel_dtb extra; do
         [ -f $dt ] && sudo ${rootPath}/bin/magiskboot dtb $dt patch
 	done
-	sudo ${rootPath}/bin/magiskboot repack vendor_boot.img >/dev/null 2>&1
+	sudo ${rootPath}/bin/magiskboot repack vendor_boot.img
 	sudo rm -rf *kernel* *dtb* ramdisk.cpio*
 	[ -f new-boot.img ] && cp -rf new-boot.img ${rootPath}/out/images/vendor_boot.img
 	sudo rm -rf new-boot.img
@@ -109,7 +109,7 @@ function magisk_boot() {
 }
 
 function system_patch() {
-		echo -e "$(date "+%m/%d %H:%M:%S") 开始修补System"
+	echo -e "$(date "+%m/%d %H:%M:%S") 开始修补System"
 
 	sudo sh -c "cat ${rootPath}/files/config/systemContextsAdd >> system/config/system_file_contexts"
 	sudo sh -c "cat ${rootPath}/files/config/systemConfigAdd >> system/config/system_fs_config"
@@ -161,7 +161,6 @@ function system_patch() {
 		echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
 		sudo rm -rf "${file}"
 	done
-
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 修改System 完成"
 
