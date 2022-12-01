@@ -4,7 +4,8 @@
 
 开启DC调光</br>
 内置Magisk</br>
-删除无用App
+删除无用App</br>
+处理cust分区
 
 
 ## Run
