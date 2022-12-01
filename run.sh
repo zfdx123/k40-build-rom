@@ -15,6 +15,9 @@ function main() {
     ${rootPath}/bin/payload-dumper-go -o ${rootPath}/out/images payload.bin
     rm -rf payload.bin
 
+	#cust分区
+	[ -f images/cust.img ] && cust_patch || cust_mv
+
 	#解包IMG
 	unpackimg system
 	unpackimg vendor
@@ -92,6 +95,21 @@ function vbmeta(){
 	mv vbmeta_system.img ${rootPath}/out/images/vbmeta_system.img
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 去除 vbmeta 验证 完成"
+}
+
+function cust_patch() {
+	echo -e "$(date "+%m/%d %H:%M:%S") 正在清理Cust分区，仅保留mipush相关配置文件"
+	unpackimg cust.img
+	sudo ls cust/cust/ | grep -v "cust_variant" | xargs rm -rf
+	repackimg cust
+	mv cust.img images/cust.img
+	echo -e "$(date "+%m/%d %H:%M:%S") 清理Cust分区完成"
+}
+
+function cust_mv() {
+	echo -e "$(date "+%m/%d %H:%M:%S") 未发现cust分区，替换相关文件"
+	mv ${rootPath}/files/images/cust.img ${rootPath}/out/images/cust.img
+	echo -e "$(date "+%m/%d %H:%M:%S") 替换分区完成"
 }
 
 function magisk_boot() {
