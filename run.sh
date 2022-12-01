@@ -126,7 +126,7 @@ function magisk_boot() {
 	sudo ${rootPath}/bin/magiskboot repack boot.img
 	sudo rm -rf *kernel* *dtb* ramdisk.cpio*
 	[ -f new-boot.img ] && mv new-boot.img images/boot.img
-	sudo rm -rf new-boot.img
+	sudo rm -rf new-boot.img boot.img
 	echo -e "$(date "+%m/%d %H:%M:%S") magisk 修补 boot 完成"
 
     echo -e "$(date "+%m/%d %H:%M:%S") 正在使用 magisk 修补 vendor_boot"
@@ -138,7 +138,7 @@ function magisk_boot() {
 	sudo ${rootPath}/bin/magiskboot repack vendor_boot.img
 	sudo rm -rf *kernel* *dtb* ramdisk.cpio*
 	[ -f new-boot.img ] && mv new-boot.img images/vendor_boot.img
-	sudo rm -rf new-boot.img
+	sudo rm -rf new-boot.img vendor_boot.img
 	echo -e "$(date "+%m/%d %H:%M:%S") magisk 修补 vendor_boot 完成"
 }
 
