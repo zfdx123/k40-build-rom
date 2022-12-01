@@ -99,7 +99,7 @@ function vbmeta(){
 
 function cust_patch() {
 	echo -e "$(date "+%m/%d %H:%M:%S") 正在清理Cust分区，仅保留mipush相关配置文件"
-	unpackimg cust.img
+	unpackimg cust
 	sudo ls cust/cust/ | grep -v "cust_variant" | xargs rm -rf
 	repackimg cust
 	mv cust.img images/cust.img
