@@ -3,6 +3,7 @@
 function main() {
     romName=${1}
 	rootPath=`pwd`
+	config_ini=${rootPath}/files/config/config.ini
 	rm -rf out
 	mkdir out
     echo -e "$(date "+%m/%d %H:%M:%S") ${romName} 正在解压刷机包"
@@ -72,7 +73,8 @@ function repackimg(){
 function super(){
 	### 打包 super
 	echo -e "$(date "+%m/%d %H:%M:%S") 开始打包 super.img"
-	sudo ${rootPath}/bin/lpmake --metadata-size 65536 --super-name super --device super:9126805504 --group main_a:9126805504 --group main_b:9126805504 --metadata-slots 3 --virtual-ab --partition system_a:readonly:$(echo $(stat -c "%s" system.img) | bc):main_a --image system_a=system.img --partition system_b:readonly:0:main_b --partition vendor_a:readonly:$(echo $(stat -c "%s" vendor.img) | bc):main_a --image vendor_a=vendor.img --partition vendor_b:readonly:0:main_b --partition product_a:readonly:$(echo $(stat -c "%s" product.img) | bc):main_a --image product_a=product.img --partition product_b:readonly:0:main_b --partition system_ext_a:readonly:$(echo $(stat -c "%s" system_ext.img) | bc):main_a --image system_ext_a=system_ext.img --partition system_ext_b:readonly:0:main_b --partition odm_a:readonly:$(echo $(stat -c "%s" odm.img) | bc):main_a --image odm_a=odm.img --partition odm_b:readonly:0:main_b --sparse --output images/super.img
+	superSize="$(cat ${config_ini} | grep "supers=" | awk -F '=' '{print $1}' )"
+	sudo ${rootPath}/bin/lpmake --metadata-size 65536 --super-name super --device super:${superSize} --group main_a:${superSize} --group main_b:${superSize} --metadata-slots 3 --virtual-ab --partition system_a:readonly:$(echo $(stat -c "%s" system.img) | bc):main_a --image system_a=system.img --partition system_b:readonly:0:main_b --partition vendor_a:readonly:$(echo $(stat -c "%s" vendor.img) | bc):main_a --image vendor_a=vendor.img --partition vendor_b:readonly:0:main_b --partition product_a:readonly:$(echo $(stat -c "%s" product.img) | bc):main_a --image product_a=product.img --partition product_b:readonly:0:main_b --partition system_ext_a:readonly:$(echo $(stat -c "%s" system_ext.img) | bc):main_a --image system_ext_a=system_ext.img --partition system_ext_b:readonly:0:main_b --partition odm_a:readonly:$(echo $(stat -c "%s" odm.img) | bc):main_a --image odm_a=odm.img --partition odm_b:readonly:0:main_b --sparse --output images/super.img
 	echo -e "$(date "+%m/%d %H:%M:%S") 打包 super.img 完成"
 }
 
@@ -175,50 +177,41 @@ function system_patch() {
     #### system
     sudo sed -i '0,/[a-z]\+\/lost\\+found/{/[a-z]\+\/lost\\+found/d}' system/config/system_file_contexts
 
-	Miui_Version="$(cat system/system/system/build.prop | grep "ro.build.version.incremental" | sed 's/=/ /g' | sed 's/\./ /g' | awk '{print $5}')"
+	Miui_Version="$(cat system/system/system/build.prop | grep "ro.build.version.incremental" | awk -F '=' '{print $2}' | awk -F '.' '{print $1}')"
 
-	p_app_path="product/product/app"
-	p_data_app_path="product/product/data-app"
-	p_priv_app_path="product/product/priv-app"
-	app_path="system/system/system/app"
-	data_app_path="system/system/system/data-app"
-	priv_app_path="system/system/system/priv-app"
+	[[ ${Miui_Version} == "V14" ]] && miui14 || miui
 
-	[ ${Miui_Version} == "V14" ] && miui14 || miui
+	while read file
+	do
+		[[ ${file} =~ "#" ]] && continue;
+		if [ -f "${file}" ] || [ -d "${file}" ]; 
+		then
+		echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
+		sudo rm -rf "${file}"
+		fi
+	done < ${rootPath}/files/config/remove_list
+
+	# app_list=(
+	# 	# "${priv_app_path}/MIUIQuickSearchBox"
+	# 	# "${data_app_path}/com.*"
+	# 	# "${app_path}/Hybrid*"
+    #   # "${p_data_app_path}/BaiduIME"
+    # )
+
+	# for file in ${app_list[*]}; do
+	# 	echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
+	# 	sudo rm -rf "${file}"
+	# done
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 修改System 完成"
 }
 
 function miui14() {
-	sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk product/product/app/AnalyticsCore/AnalyticsCore.apk
-
-	app_list=(
-		# "${p_priv_app_path}/MIUIQuickSearchBox"
-		# "${p_app_path}/Hybrid*"
-		# "${p_data_app_path}/MIUIVipAccount"
-	)
-
-	for file in ${app_list[*]}; do
-		echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
-		sudo rm -rf "${file}"
-	done
+	[[ $(cat ${config_ini} | grep "AnalyticsCore=" | awk -F '=' '{print $2}' ) == "true" ]] && sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk product/product/app/AnalyticsCore/AnalyticsCore.apk
 }
 
 function miui() {
-	#替换掉广告毒瘤
-	sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk system/system/system/app/AnalyticsCore/AnalyticsCore.apk
-
-    app_list=(
-		# "${priv_app_path}/MIUIQuickSearchBox"
-		# "${data_app_path}/com.*"
-		# "${app_path}/Hybrid*"
-        # "${p_data_app_path}/BaiduIME"
-    )
-
-	for file in ${app_list[*]}; do
-		echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
-		sudo rm -rf "${file}"
-	done
+	[[ $(cat ${config_ini} | grep "AnalyticsCore=" | awk -F '=' '{print $2}' ) == "true" ]] && sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk system/system/system/app/AnalyticsCore/AnalyticsCore.apk
 }
 
 main ${1}

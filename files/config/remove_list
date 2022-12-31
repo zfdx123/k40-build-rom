@@ -1,0 +1,8 @@
+# product/product/app -> product/app
+# product/product/data-app -> product/data-app
+# product/product/priv-app -> product/priv-app
+# system/system/system/app -> system/app
+# system/system/system/data-app -> system/data-app
+# system/system/system/priv-app -> system/priv-app
+# 要写入的路径 -> 手机中看到的路径
+# 大部分MIUI14 app都在 product 分区
