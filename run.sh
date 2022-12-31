@@ -175,32 +175,50 @@ function system_patch() {
     #### system
     sudo sed -i '0,/[a-z]\+\/lost\\+found/{/[a-z]\+\/lost\\+found/d}' system/config/system_file_contexts
 
+	Miui_Version="$(cat system/system/system/build.prop | grep "ro.build.version.incremental" | sed 's/=/ /g' | sed 's/\./ /g' | awk '{print $5}')"
+
+	p_app_path="product/product/app"
+	p_data_app_path="product/product/data-app"
+	p_priv_app_path="product/product/priv-app"
+	app_path="system/system/system/app"
+	data_app_path="system/system/system/data-app"
+	priv_app_path="system/system/system/priv-app"
+
+	[ ${Miui_Version} == "V14" ] && miui14 || miui
+
+	echo -e "$(date "+%m/%d %H:%M:%S") 修改System 完成"
+}
+
+function miui14() {
+	sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk product/product/app/AnalyticsCore/AnalyticsCore.apk
+
+	app_list=(
+		# "${p_priv_app_path}/MIUIQuickSearchBox"
+		# "${p_app_path}/Hybrid*"
+		# "${p_data_app_path}/MIUIVipAccount"
+	)
+
+	for file in ${app_list[*]}; do
+		echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
+		sudo rm -rf "${file}"
+	done
+}
+
+function miui() {
 	#替换掉广告毒瘤
 	sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk system/system/system/app/AnalyticsCore/AnalyticsCore.apk
 
     app_list=(
-        "product/product/data-app/BaiduIME"
-        "system/system/system/app/mab"
-        "system/system/system/app/MSA"
-        "system/system/system/app/Hybrid*"
-		"system/system/system/app/SogouInput"
-		"system/system/system/data-app/com.*"
-		"system/system/system/data-app/MiDrive"
-		"system/system/system/data-app/SmartHome"
-		"system/system/system/data-app/MIUIYoupin"
-		"system/system/system/data-app/MIUINewHome"
-		"system/system/system/data-app/MIUIVipAccount"
-		"system/system/system/data-app/MIUIDuokanReader"
-		"system/system/system/priv-app/MIUIQuickSearchBox"
+		# "${priv_app_path}/MIUIQuickSearchBox"
+		# "${data_app_path}/com.*"
+		# "${app_path}/Hybrid*"
+        # "${p_data_app_path}/BaiduIME"
     )
 
 	for file in ${app_list[*]}; do
 		echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
 		sudo rm -rf "${file}"
 	done
-
-	echo -e "$(date "+%m/%d %H:%M:%S") 修改System 完成"
-
 }
 
 main ${1}
