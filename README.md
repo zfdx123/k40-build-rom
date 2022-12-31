@@ -7,6 +7,7 @@
 处理cust分区
 
 ## 警告 ⚠
+配置文件在files->config->config.ini 非特殊情况请勿修改
 如果需要精简app请修改files->config->remove_list 根据内部的模板正确使用</br>
 区分miui和miui14是因为miui14处于dev版本，尚不确定是否还有其他修改，暂定区分为两个函数</br>
 
