@@ -4,7 +4,7 @@ function main() {
     romName=${1}
 	rootPath=`pwd`
 	config_ini=${rootPath}/files/config/config.ini
-	rm -rf out
+	sudo rm -rf out
 	mkdir out
     echo -e "$(date "+%m/%d %H:%M:%S") ${romName} 正在解压刷机包"
 	unzip -o ${romName} -d out
