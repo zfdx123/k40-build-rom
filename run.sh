@@ -73,7 +73,7 @@ function repackimg(){
 function super(){
 	### 打包 super
 	echo -e "$(date "+%m/%d %H:%M:%S") 开始打包 super.img"
-	superSize="$(cat ${config_ini} | grep "supers=" | awk -F '=' '{print $1}' )"
+	superSize="$(cat ${config_ini} | grep "supers=" | awk -F '=' '{print $2}' )"
 	sudo ${rootPath}/bin/lpmake --metadata-size 65536 --super-name super --device super:${superSize} --group main_a:${superSize} --group main_b:${superSize} --metadata-slots 3 --virtual-ab --partition system_a:readonly:$(echo $(stat -c "%s" system.img) | bc):main_a --image system_a=system.img --partition system_b:readonly:0:main_b --partition vendor_a:readonly:$(echo $(stat -c "%s" vendor.img) | bc):main_a --image vendor_a=vendor.img --partition vendor_b:readonly:0:main_b --partition product_a:readonly:$(echo $(stat -c "%s" product.img) | bc):main_a --image product_a=product.img --partition product_b:readonly:0:main_b --partition system_ext_a:readonly:$(echo $(stat -c "%s" system_ext.img) | bc):main_a --image system_ext_a=system_ext.img --partition system_ext_b:readonly:0:main_b --partition odm_a:readonly:$(echo $(stat -c "%s" odm.img) | bc):main_a --image odm_a=odm.img --partition odm_b:readonly:0:main_b --sparse --output images/super.img
 	echo -e "$(date "+%m/%d %H:%M:%S") 打包 super.img 完成"
 }
