@@ -194,8 +194,8 @@ function miui14() {
 	# theme
 	sudo cp -rf ${rootPath}/files/config/com.android.settings product/product/media/theme/default/com.android.settings
 
-	sudo sh -c "cat ${rootPath}/files/config/systemContextsAddMiui14 >> system/config/system_file_contexts"
-	sudo sh -c "cat ${rootPath}/files/config/systemConfigAddMiui14 >> system/config/system_fs_config"
+	sudo sh -c "cat ${rootPath}/files/config/systemContextsAddMiui14 >> product/config/system_file_contexts"
+	sudo sh -c "cat ${rootPath}/files/config/systemConfigAddMiui14 >> product/config/system_fs_config"
 	# Magisk
 	sudo mkdir product/product/data-app/Magisk
 	sudo cp ${rootPath}/files/app/Magisk.apk product/product/data-app/Magisk/Magisk.apk
