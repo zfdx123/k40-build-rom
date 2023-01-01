@@ -159,14 +159,6 @@ function patch_vab() {
 function system_patch() {
 	echo -e "$(date "+%m/%d %H:%M:%S") 开始修补System"
 
-	sudo sh -c "cat ${rootPath}/files/config/systemContextsAdd >> system/config/system_file_contexts"
-	sudo sh -c "cat ${rootPath}/files/config/systemConfigAdd >> system/config/system_fs_config"
-	# Magisk
-	sudo mkdir system/system/system/data-app/Magisk
-	sudo cp ${rootPath}/files/app/Magisk.apk system/system/system/data-app/Magisk/Magisk.apk
-
-	#sudo cp -rf ${rootPath}/files/config/com.android.systemui system/system/system/media/theme/default/com.android.systemui
-
     # DC调光
 	sudo sed -i 's/<bool name=\"support_dc_backlight\">false<\/bool>/<bool name=\"support_dc_backlight\">true<\/bool>/g' product/product/etc/device_features/*xml
 	sudo sed -i 's/<bool name=\"support_secret_dc_backlight\">true<\/bool>/<bool name=\"support_secret_dc_backlight\">false<\/bool>/g' product/product/etc/device_features/*xml
@@ -179,7 +171,7 @@ function system_patch() {
     #### system
     sudo sed -i '0,/[a-z]\+\/lost\\+found/{/[a-z]\+\/lost\\+found/d}' system/config/system_file_contexts
 
-	Miui_Version="$(cat system/system/system/build.prop | grep "ro.build.version.incremental" | awk -F '=' '{print $2}' | awk -F '.' '{print $1}')"
+	Miui_Version="$(sudo cat system/system/system/build.prop | grep "ro.build.version.incremental" | awk -F '=' '{print $2}' | awk -F '.' '{print $1}')"
 
 	[[ ${Miui_Version} == "V14" ]] && miui14 || miui
 
@@ -192,18 +184,6 @@ function system_patch() {
 			echo -e "$(date "+%m/%d %H:%M:%S") Del ${file}"
 			sudo rm -rf ${file}
 		fi
-
-		# [[ -z ${file} ]] && continue;
-		# if [[ ${file} =~ "mod" ]];
-		# then
-		# 	echo -e "$(date "+%m/%d %H:%M:%S") Del ${file}"
-		# 	a_path=$(echo ${file} | awk '{print $2}')
-		# 	a_name=$(echo ${file} | awk '{print $3}')
-		# 	sudo find ${a_path} -name ${a_name} | sudo xargs rm -rf
-		# else
-		# 	echo -e "$(date "+%m/%d %H:%M:%S") Find Del ${file}"
-		# 	sudo find . -name ${file} | sudo xargs rm -rf
-		# fi
 	done < ${rootPath}/files/config/remove_list
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 修改System 完成"
@@ -213,12 +193,24 @@ function miui14() {
 	[[ $(cat ${config_ini} | grep "AnalyticsCore=" | awk -F '=' '{print $2}' ) == "true" ]] && sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk product/product/app/AnalyticsCore/AnalyticsCore.apk
 	# theme
 	sudo cp -rf ${rootPath}/files/config/com.android.settings product/product/media/theme/default/com.android.settings
+
+	sudo sh -c "cat ${rootPath}/files/config/systemContextsAddMiui14 >> system/config/system_file_contexts"
+	sudo sh -c "cat ${rootPath}/files/config/systemConfigAddMiui14 >> system/config/system_fs_config"
+	# Magisk
+	sudo mkdir product/product/data-app/Magisk
+	sudo cp ${rootPath}/files/app/Magisk.apk product/product/data-app/Magisk/Magisk.apk
 }
 
 function miui() {
 	[[ $(cat ${config_ini} | grep "AnalyticsCore=" | awk -F '=' '{print $2}' ) == "true" ]] && sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk system/system/system/app/AnalyticsCore/AnalyticsCore.apk
 	# theme
 	sudo cp -rf ${rootPath}/files/config/com.android.settings system/system/system/media/theme/default/com.android.settings
+
+	sudo sh -c "cat ${rootPath}/files/config/systemContextsAddMiui >> system/config/system_file_contexts"
+	sudo sh -c "cat ${rootPath}/files/config/systemConfigAddMiui >> system/config/system_fs_config"
+	# Magisk
+	sudo mkdir system/system/system/data-app/Magisk
+	sudo cp ${rootPath}/files/app/Magisk.apk system/system/system/data-app/Magisk/Magisk.apk
 }
 
 main ${1}
