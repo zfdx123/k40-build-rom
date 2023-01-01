@@ -161,8 +161,6 @@ function system_patch() {
 	sudo mkdir system/system/system/data-app/Magisk
 	sudo cp ${rootPath}/files/app/Magisk.apk system/system/system/data-app/Magisk/Magisk.apk
 
-	# theme
-	sudo cp -rf ${rootPath}/files/config/com.android.settings system/system/system/media/theme/default/com.android.settings
 	#sudo cp -rf ${rootPath}/files/config/com.android.systemui system/system/system/media/theme/default/com.android.systemui
 
     # DC调光
@@ -208,10 +206,14 @@ function system_patch() {
 
 function miui14() {
 	[[ $(cat ${config_ini} | grep "AnalyticsCore=" | awk -F '=' '{print $2}' ) == "true" ]] && sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk product/product/app/AnalyticsCore/AnalyticsCore.apk
+	# theme
+	sudo cp -rf ${rootPath}/files/config/com.android.settings product/product/media/theme/default/com.android.settings
 }
 
 function miui() {
 	[[ $(cat ${config_ini} | grep "AnalyticsCore=" | awk -F '=' '{print $2}' ) == "true" ]] && sudo cp -rf ${rootPath}/files/app/AnalyticsCore.apk system/system/system/app/AnalyticsCore/AnalyticsCore.apk
+	# theme
+	sudo cp -rf ${rootPath}/files/config/com.android.settings system/system/system/media/theme/default/com.android.settings
 }
 
 main ${1}
