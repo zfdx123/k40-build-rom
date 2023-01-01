@@ -184,22 +184,10 @@ function system_patch() {
 		[[ ${file} =~ "#" ]] && continue;
 		if [ -f "${file}" ] || [ -d "${file}" ]; 
 		then
-		echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
-		sudo rm -rf "${file}"
+		echo -e "$(date "+%m/%d %H:%M:%S") Find Del ${file}"
+		sudo find . -name "${file}" | xargs rm -rf
 		fi
 	done < ${rootPath}/files/config/remove_list
-
-	# app_list=(
-	# 	# "${priv_app_path}/MIUIQuickSearchBox"
-	# 	# "${data_app_path}/com.*"
-	# 	# "${app_path}/Hybrid*"
-    #   # "${p_data_app_path}/BaiduIME"
-    # )
-
-	# for file in ${app_list[*]}; do
-	# 	echo -e "$(date "+%m/%d %H:%M:%S") Delete ${file}"
-	# 	sudo rm -rf "${file}"
-	# done
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 修改System 完成"
 }
