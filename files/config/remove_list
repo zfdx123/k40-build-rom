@@ -1,5 +1,5 @@
 # 直接输入app文件夹名称即可删除，不需要其他的路径信息(请务必保证名称的唯一性)
-# 如果需要删除多个模糊匹配文件请输入完整路径,或者文件名存在不唯一的使用，请使用完整匹配模式 ($ 路径 名称)
+# 如果需要删除多个模糊匹配文件请输入完整路径,或者文件名存在不唯一的使用，请使用完整匹配模式 (mod 路径 名称)
 
 # product/product/app -> product/app
 # product/product/data-app -> product/data-app
@@ -11,4 +11,4 @@
 # 大部分MIUI14 app都在 product 分区
 
 # MSA 普通匹配(请保证文件名的唯一性，否则请使用完整匹配)
-# $ system/system/system/data-app/ com.* 完整匹配 模糊匹配到内容，注意空格
+# mod system/system/system/data-app/ com.* 完整匹配 模糊匹配到内容，注意空格
