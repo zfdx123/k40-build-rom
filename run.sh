@@ -17,7 +17,7 @@ function main() {
     rm -rf payload.bin
 
 	#cust分区
-	[ -f images/cust.img ] && cust_patch || cust_mv
+	[[ $(cat ${config_ini} | grep "cust=" | awk -F '=' '{print $2}' ) == "true" ]] && cust_in
 
 	#解包IMG
 	unpackimg system
@@ -97,6 +97,10 @@ function vbmeta(){
 	mv vbmeta_system.img ${rootPath}/out/images/vbmeta_system.img
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 去除 vbmeta 验证 完成"
+}
+
+function cust_in() {
+	[ -f images/cust.img ] && cust_patch || cust_mv
 }
 
 function cust_patch() {
