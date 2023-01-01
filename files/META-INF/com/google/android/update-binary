@@ -118,7 +118,7 @@ package_extract_file "images/xbl_config.img" "/dev/block/by-name/xbl_config_b"
 package_extract_file "images/xbl.img" "/dev/block/by-name/xbl_a"
 package_extract_file "images/xbl.img" "/dev/block/by-name/xbl_b"
 # flash firmware done
-package_extract_file "images/cust.img" "/dev/block/by-name/cust"
+[[ -f "images/cust.img" ]] && package_extract_file "images/cust.img" "/dev/block/by-name/cust" || ui_print "不存在cust分区,跳过"
 package_extract_file "images/super.img" "/dev/block/by-name/super"
 
 
