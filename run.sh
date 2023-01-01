@@ -114,7 +114,7 @@ function cust_patch() {
 
 function cust_mv() {
 	echo -e "$(date "+%m/%d %H:%M:%S") 未发现cust分区，替换相关文件"
-	mv ${rootPath}/files/images/cust.img ${rootPath}/out/images/cust.img
+	cp ${rootPath}/files/images/cust.img ${rootPath}/out/images/cust.img
 	echo -e "$(date "+%m/%d %H:%M:%S") 替换分区完成"
 }
 
