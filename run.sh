@@ -193,11 +193,11 @@ function system_patch() {
 			echo -e "$(date "+%m/%d %H:%M:%S") Del ${file}"
 			path=$(echo ${file} | awk '{print $2}')
 			name=$(echo ${file} | awk '{print $3}')
-			sudo find ${path} -name "${name}" | xargs rm -rf
+			sudo find ${path} -name "${name}" | sudo xargs rm -rf
 			continue;
 		fi 
 		echo -e "$(date "+%m/%d %H:%M:%S") Find Del ${file}"
-		sudo find . -name "${file}" | xargs rm -rf
+		sudo find . -name "${file}" | sudo xargs rm -rf
 	done < ${rootPath}/files/config/remove_list
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 修改System 完成"
