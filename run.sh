@@ -186,18 +186,24 @@ function system_patch() {
 	while read file
 	do
 		[[ ${file} =~ "#" ]] && continue;
-		[[ -z ${file} ]] && continue;
 
-		if [[ ${file} =~ "mod" ]];
+		if [ -f "${file}" ] || [ -d "${file}" ];
 		then
 			echo -e "$(date "+%m/%d %H:%M:%S") Del ${file}"
-			a_path=$(echo ${file} | awk '{print $2}')
-			a_name=$(echo ${file} | awk '{print $3}')
-			sudo find ${a_path} -name ${a_name} | sudo xargs rm -rf
-		else
-			echo -e "$(date "+%m/%d %H:%M:%S") Find Del ${file}"
-			sudo find . -name ${file} | sudo xargs rm -rf
+			sudo rm -rf ${file}
 		fi
+
+		# [[ -z ${file} ]] && continue;
+		# if [[ ${file} =~ "mod" ]];
+		# then
+		# 	echo -e "$(date "+%m/%d %H:%M:%S") Del ${file}"
+		# 	a_path=$(echo ${file} | awk '{print $2}')
+		# 	a_name=$(echo ${file} | awk '{print $3}')
+		# 	sudo find ${a_path} -name ${a_name} | sudo xargs rm -rf
+		# else
+		# 	echo -e "$(date "+%m/%d %H:%M:%S") Find Del ${file}"
+		# 	sudo find . -name ${file} | sudo xargs rm -rf
+		# fi
 	done < ${rootPath}/files/config/remove_list
 
 	echo -e "$(date "+%m/%d %H:%M:%S") 修改System 完成"
